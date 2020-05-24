@@ -20,16 +20,16 @@ package object journal {
   object CassandraJournal {
     import Live._
 
-    def create(config: Config): ZLayer[Has[Session], Throwable, Has[AsyncJournal]] = makeLayer(live(config))
+    def create(config: Config): ZLayer[Blocking with Has[Session], Throwable, CassandraJournal] = makeLayer(live(config))
 
-    def create(config: Config, session: Session): Layer[Throwable, CassandraJournal] = makeLayer(live(config, session))
+    def create(config: Config, session: Session): ZLayer[Blocking, Throwable, CassandraJournal] = makeLayer(live(config, session))
 
   }
 
   class Live protected (queue: Queue[PromisedWrite], session: CassandraJournalSession) extends AsyncJournal {
 
     //Just workaround
-    def startAsyncWriter() =
+    def startAsyncWriter(): ZIO[Blocking, Throwable, Done] =
       ZStream
         .fromQueueWithShutdown(queue)
         .mapMParUnordered(session.config.writeParallelism) { b =>
@@ -111,14 +111,14 @@ package object journal {
 
   object Live {
 
-    def live(config: Config): ZIO[Has[Session], Throwable, AsyncJournal] =
+    def live(config: Config): ZIO[Blocking with Has[Session], Throwable, AsyncJournal] =
       for {
         session <- ZIO.service[Session]
         journal <- live(config, session)
       } yield journal
 
     //Possible journal setup flow
-    def live(config: Config, session: Session): Task[AsyncJournal] = {
+    def live[R](config: Config, session: Session): RIO[Blocking, AsyncJournal] = {
       //TODO: config initialization
       println(config)
       val journalConfig: Task[CassandraJournalConfig] = ???
@@ -146,7 +146,7 @@ package object journal {
         queue   <- Queue.bounded[PromisedWrite](jc.writeQueueSize)
         journal = new Live(queue, journalSession)
         _       <- journal.startAsyncWriter().fork
-      } yield journal
+      } yield journal.asInstanceOf[AsyncJournal]
     }
 
     def make[R](journal: RIO[R, AsyncJournal]): ZManaged[R, Throwable, AsyncJournal] =
