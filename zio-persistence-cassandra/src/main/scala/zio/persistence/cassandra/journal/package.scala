@@ -146,7 +146,7 @@ package object journal {
         queue   <- Queue.bounded[PromisedWrite](jc.writeQueueSize)
         journal = new Live(queue, journalSession)
         _       <- journal.startAsyncWriter().fork
-      } yield journal.asInstanceOf[AsyncJournal]
+      } yield journal
     }
 
     def make[R](journal: RIO[R, AsyncJournal]): ZManaged[R, Throwable, AsyncJournal] =
