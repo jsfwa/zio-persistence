@@ -118,7 +118,7 @@ package object journal {
       } yield journal
 
     //Possible journal setup flow
-    def live[R](config: Config, session: Session): RIO[Blocking, AsyncJournal] = {
+    def live(config: Config, session: Session): RIO[Blocking, AsyncJournal] = {
       //TODO: config initialization
       println(config)
       val journalConfig: Task[CassandraJournalConfig] = ???
