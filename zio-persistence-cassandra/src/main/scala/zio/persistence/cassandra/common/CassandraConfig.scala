@@ -11,7 +11,7 @@ case class CassandraConfig(
   replicationStrategy: ReplicationStrategy,
   gcGraceSeconds: Int,
   tableName: String,
-  compactionStrategy: CompactionStrategy,
+  compactionStrategy: CompactionStrategy
 )
 
 object CassandraConfig {

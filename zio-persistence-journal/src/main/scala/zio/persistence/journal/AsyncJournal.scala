@@ -5,7 +5,7 @@ import zio.stream._
 
 trait AsyncJournal {
 
-  def highestSequenceNr(persistenceId: PersistenceId) : Task[Long]
+  def highestSequenceNr(persistenceId: PersistenceId): Task[Long]
 
   def persist(batch: AtomicBatch): Task[Done]
 

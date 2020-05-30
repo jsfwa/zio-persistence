@@ -3,11 +3,11 @@ package zio.persistence.cassandra.journal
 import java.lang
 
 import com.datastax.dse.driver.api.core.cql.reactive.ReactiveRow
-import com.datastax.oss.driver.api.core.cql.{BatchStatement, DefaultBatchType, PreparedStatement, Row}
+import com.datastax.oss.driver.api.core.cql.{ BatchStatement, DefaultBatchType, PreparedStatement, Row }
 import com.datastax.oss.driver.api.core.uuid.Uuids
 import zio.cassandra.service.Session
 import zio.persistence.journal._
-import zio.{Task, ZIO, stream}
+import zio.{ stream, Task, ZIO }
 
 import scala.jdk.CollectionConverters._
 
@@ -42,8 +42,10 @@ class CassandraJournalSession(
 
   def loadSnapshot(persistenceId: PersistenceId, criteria: SnapshotCriteria): Task[Option[Row]] =
     for {
-      bs <- underlying.bind(readSnapshot,
-                            Seq(persistenceId, criteria.minSequenceNr.asJava, criteria.maxSequenceNr.asJava))
+      bs <- underlying.bind(
+             readSnapshot,
+             Seq(persistenceId, criteria.minSequenceNr.asJava, criteria.maxSequenceNr.asJava)
+           )
       res <- underlying.selectOne(bs)
     } yield res
 
@@ -72,10 +74,12 @@ class CassandraJournalSession(
     } yield ()
   }
 
-  def read[E](persistenceId: PersistenceId,
-              partitionNr: Long,
-              fromSequenceNr: Long,
-              toSequenceNr: Long): ZIO[Any, Throwable, stream.Stream[Throwable, ReactiveRow]] =
+  def read[E](
+    persistenceId: PersistenceId,
+    partitionNr: Long,
+    fromSequenceNr: Long,
+    toSequenceNr: Long
+  ): ZIO[Any, Throwable, stream.Stream[Throwable, ReactiveRow]] =
     for {
       bs <- underlying.bind(
              readJournal,

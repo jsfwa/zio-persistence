@@ -1,6 +1,6 @@
 package zio.persistence.cassandra.journal
 
-import zio.persistence.cassandra.common.{CassandraConfig, CassandraStatements}
+import zio.persistence.cassandra.common.{ CassandraConfig, CassandraStatements }
 
 class CassandraJournalStatements(val config: CassandraConfig) extends CassandraStatements {
 

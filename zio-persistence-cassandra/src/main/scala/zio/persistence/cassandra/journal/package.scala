@@ -12,7 +12,7 @@ import zio.persistence.cassandra.common.CassandraConfig
 import zio.persistence.cassandra.snapshot.CassandraSnapshotStatements
 import zio.persistence.journal._
 import zio.stream._
-import zio.{blocking => _, _}
+import zio.{ blocking => _, _ }
 
 package object journal {
 
@@ -57,12 +57,16 @@ package object journal {
      * @param replayRule
      * @return
      */
-    override def replay(persistenceId: PersistenceId,
-                        replayRule: ReplayCriteria): Stream[Throwable, PersistentEvent] = {
+    override def replay(
+      persistenceId: PersistenceId,
+      replayRule: ReplayCriteria
+    ): Stream[Throwable, PersistentEvent] = {
 
       //Previous cursor is necessary for stop point
-      def internalRead(cursor: Ref[Long],
-                       previous: Ref[Long]): ZIO[Any, Option[Throwable], stream.Stream[Throwable, ReactiveRow]] =
+      def internalRead(
+        cursor: Ref[Long],
+        previous: Ref[Long]
+      ): ZIO[Any, Option[Throwable], stream.Stream[Throwable, ReactiveRow]] =
         for {
           current <- cursor.get
           inner <- previous.modify {
@@ -86,13 +90,12 @@ package object journal {
       val replayJob = for {
         previous <- Ref.make[Long](-1L)
         current  <- Ref.make[Long](replayRule.fromSequenceNr)
-      } yield
-        ZStream
-          .repeatEffectOption(internalRead(current, previous))
-          .flatMap(_.mapM { row =>
-            val res: PersistentEvent = fromRow(row)
-            current.set(res.sequenceNr).as(res)
-          })
+      } yield ZStream
+        .repeatEffectOption(internalRead(current, previous))
+        .flatMap(_.mapM { row =>
+          val res: PersistentEvent = fromRow(row)
+          current.set(res.sequenceNr).as(res)
+        })
 
       ZStream.fromEffect(replayJob).flatten
     }
@@ -114,7 +117,7 @@ package object journal {
       session.saveSnapshot(snapshot)
 
     override def loadSnapshot(persistenceId: PersistenceId, criteria: SnapshotCriteria): Task[Option[PersistentEvent]] =
-      session.loadSnapshot(persistenceId, criteria).map { _.map(fromRow) }
+      session.loadSnapshot(persistenceId, criteria).map(_.map(fromRow))
 
     override def highestSequenceNr(persistenceId: PersistenceId): Task[Long] = {
 
@@ -178,13 +181,15 @@ package object journal {
         readHighestPartitionSeqNr <- session.prepare(journalStatements.selectHighestSequenceNr)
         writeSnapshot             <- session.prepare(snapshotStatements.writeQuery)
         readSnapshot              <- session.prepare(snapshotStatements.selectQuery)
-        journalSession = new CassandraJournalSession(session,
-                                                     jc,
-                                                     writeJournal,
-                                                     readJournal,
-                                                     readHighestPartitionSeqNr,
-                                                     writeSnapshot,
-                                                     readSnapshot)
+        journalSession = new CassandraJournalSession(
+          session,
+          jc,
+          writeJournal,
+          readJournal,
+          readHighestPartitionSeqNr,
+          writeSnapshot,
+          readSnapshot
+        )
         queue   <- Queue.bounded[PromisedWrite](jc.writeQueueSize)
         journal = new Live(queue, journalSession)
         _       <- journal.startAsyncWriter().fork

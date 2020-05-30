@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 import java.time.Instant
 import java.util.UUID
 
-import zio.persistence.journal.{PersistenceId, PersistentEvent}
+import zio.persistence.journal.{ PersistenceId, PersistentEvent }
 
 object SimplePersistenceEvent {
 

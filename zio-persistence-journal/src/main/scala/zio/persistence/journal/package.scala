@@ -1,6 +1,6 @@
 package zio.persistence
 
-import zio.{blocking => _, _}
+import zio.{ blocking => _, _ }
 
 package object journal {
 

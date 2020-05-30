@@ -1,6 +1,6 @@
 package zio.persistence.cassandra.snapshot
 
-import zio.persistence.cassandra.common.{CassandraConfig, CassandraStatements}
+import zio.persistence.cassandra.common.{ CassandraConfig, CassandraStatements }
 
 class CassandraSnapshotStatements(val config: CassandraConfig) extends CassandraStatements {
 
