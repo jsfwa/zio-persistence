@@ -7,7 +7,7 @@ class CassandraSnapshotStatements(val config: CassandraConfig) extends Cassandra
   val keyspaceQuery: String =
     s"""
        |CREATE KEYSPACE IF NOT EXISTS ${config.keyspace}
-       |WITH REPLICATION = ${config.replicationStrategy}
+       | WITH REPLICATION = ${config.replicationStrategy.toCQL}
        """.stripMargin.trim
 
   val tableQuery: String = s"""
@@ -34,6 +34,7 @@ class CassandraSnapshotStatements(val config: CassandraConfig) extends Cassandra
     s"""
        |SELECT * FROM ${tableName} WHERE
        |        persistence_id = ? AND
+       |        sequence_nr >= ? AND
        |        sequence_nr <= ? 
        |        ORDER BY sequence_nr
        |        DESC

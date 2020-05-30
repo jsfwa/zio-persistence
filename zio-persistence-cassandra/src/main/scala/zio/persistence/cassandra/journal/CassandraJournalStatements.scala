@@ -7,7 +7,7 @@ class CassandraJournalStatements(val config: CassandraConfig) extends CassandraS
   val keyspaceQuery: String =
     s"""
        |CREATE KEYSPACE IF NOT EXISTS ${config.keyspace}
-       |WITH REPLICATION = ${config.replicationStrategy}
+       | WITH REPLICATION = ${config.replicationStrategy.toCQL}
        """.stripMargin.trim
 
   val tableQuery: String = s"""
@@ -42,7 +42,7 @@ class CassandraJournalStatements(val config: CassandraConfig) extends CassandraS
 
   val selectHighestSequenceNr: String =
     s"""
-       |SELECT sequence_nr, used FROM ${tableName} WHERE
+       |SELECT sequence_nr FROM ${tableName} WHERE
        |       persistence_id = ? AND
        |       partition_nr = ?
        |       ORDER BY sequence_nr

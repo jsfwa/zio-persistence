@@ -5,14 +5,14 @@ import zio.stream._
 
 trait AsyncJournal {
 
+  def highestSequenceNr(persistenceId: PersistenceId) : Task[Long]
+
   def persist(batch: AtomicBatch): Task[Done]
 
-  def replay(replayRule: ReplayCriteria): Stream[Throwable, PersistentEvent]
+  def replay(persistenceId: PersistenceId, replayRule: ReplayCriteria): Stream[Throwable, PersistentEvent]
 
   def saveSnapshot(snapshot: PersistentEvent): Task[Done]
 
-  def loadSnapshot(criteria: SnapshotCriteria): Task[Option[PersistentEvent]]
-
-  def shutdown() : Task[Done]
+  def loadSnapshot(persistenceId: PersistenceId, criteria: SnapshotCriteria): Task[Option[PersistentEvent]]
 
 }
