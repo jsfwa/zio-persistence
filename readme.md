@@ -1,5 +1,5 @@
 ### zio-persistence-journal
-##### (cassandra only for now)
+##### (cassandra only, for now)
 
 #### Why?
 Currently, only alternative for persistence is Akka framework, which based on actors hence 
