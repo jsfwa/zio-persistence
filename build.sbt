@@ -5,28 +5,12 @@ lazy val journal =
       scalaVersion := "2.13.2",
       name := "zio-persistence-journal",
       libraryDependencies ++=
-//        Dependencies.cassandraDependencies ++
-          Dependencies.zioDependencies ++
+        //        Dependencies.cassandraDependencies ++
+        Dependencies.zioDependencies ++
           Dependencies.testCommon,
-      scalacOptions ++= Seq(
-        "-encoding",
-        "utf-8",
-        "-unchecked",
-        "-explaintypes",
-        "-Yrangepos",
-        "-Ywarn-unused",
-        "-Ymacro-annotations",
-        "-deprecation",
-        "-language:higherKinds",
-        "-language:implicitConversions",
-        "-Xlint:-serial",
-        "-Xfatal-warnings",
-        "-Werror",
-        "-Wconf:any:error"
-      ),
-      sources in (Compile, doc) := Seq.empty,
+      sources in(Compile, doc) := Seq.empty,
       publishArtifact in GlobalScope in Test := false,
-      publishArtifact in (Compile, packageDoc) := false,
+      publishArtifact in(Compile, packageDoc) := false,
       parallelExecution in Test := false
     )
 
@@ -37,28 +21,31 @@ lazy val persistenceCassandra = (project in file("zio-persistence-cassandra"))
     scalaVersion := "2.13.2",
     name := "zio-persistence-cassandra",
     libraryDependencies ++=
-              Dependencies.cassandraDependencies ++
-      Dependencies.zioDependencies ++
+      Dependencies.cassandraDependencies ++
+        Dependencies.zioDependencies ++
+        Dependencies.cassandraContainers ++
         Dependencies.testCommon,
-    scalacOptions ++= Seq(
-      "-encoding",
-      "utf-8",
-      "-unchecked",
-      "-explaintypes",
-      "-Yrangepos",
-      "-Ywarn-unused",
-      "-Ymacro-annotations",
-      "-deprecation",
-      "-language:higherKinds",
-      "-language:implicitConversions",
-      "-Xlint:-serial",
-      "-Xfatal-warnings",
-      "-Werror",
-      "-Wconf:any:error"
-    ),
-    sources in (Compile, doc) := Seq.empty,
+
+    sources in(Compile, doc) := Seq.empty,
     publishArtifact in GlobalScope in Test := false,
-    publishArtifact in (Compile, packageDoc) := false,
+    publishArtifact in(Compile, packageDoc) := false,
+    parallelExecution in Test := false
+  )
+
+lazy val bench = (project in file("benchmark"))
+  .enablePlugins(JmhPlugin)
+  .dependsOn(persistenceCassandra)
+  .settings(
+    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
+    scalaVersion := "2.13.2",
+    name := "zio-persistence-benchmark",
+    libraryDependencies ++=
+      Dependencies.cassandraDependencies ++
+        Dependencies.zioDependencies ++
+        Dependencies.cassandraContainers,
+    sources in(Compile, doc) := Seq.empty,
+    publishArtifact in GlobalScope in Test := false,
+    publishArtifact in(Compile, packageDoc) := false,
     parallelExecution in Test := false
   )
 
@@ -67,3 +54,20 @@ lazy val root = (project in file("."))
   .settings(
     skip in publish := true
   )
+
+ThisBuild / scalacOptions ++= Seq(
+  "-encoding",
+  "utf-8",
+  "-unchecked",
+  "-explaintypes",
+  "-Yrangepos",
+  "-Ywarn-unused",
+  "-Ymacro-annotations",
+  "-deprecation",
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-Xlint:-serial",
+  "-Xfatal-warnings",
+  "-Werror",
+  "-Wconf:any:error"
+),

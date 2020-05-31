@@ -3,7 +3,7 @@
 
 #### Why?
 Currently, only alternative for persistence is Akka framework, which based on actors hence 
-struggles of lack of backpressure during replay.
+struggles with lack of backpressure during replay.
 It makes impossible to manipulate huge event logs(10m-100m+ per persistence id)
 
 Our persistence implementation relies on ZStreams, provides light and flexible control over your eventsource pipelines

@@ -18,9 +18,12 @@ object Dependencies {
     "dev.zio" %% "zio-interop-reactivestreams" % javaStreamsInterop
   )
 
-  val testCommon = Seq(
+  val cassandraContainers = Seq(
     "com.dimafeng"       %% "testcontainers-scala-core"      % "0.37.0",
     "com.dimafeng"       %% "testcontainers-scala-cassandra" % "0.37.0",
+  )
+
+  val testCommon = Seq(
     "org.wvlet.airframe" %% "airframe-log"                   % "20.5.1",
     "org.slf4j"          % "slf4j-jdk14"                     % "1.7.21",
     "dev.zio"            %% "zio-test"                       % zioVersion,
